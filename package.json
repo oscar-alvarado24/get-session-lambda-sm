@@ -1,0 +1,29 @@
+{
+  "name": "get-session-lambda",
+  "version": "1.0.0",
+  "description": "Lambda function to get last patient sessions from DynamoDB",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "npm install --production",
+    "zip": "npm run clean && zip -r get-session-lambda.zip . -x '*.git*' 'node_modules/.cache/*' '*.md' '*.txt' '.DS_Store' '*.log'",
+    "deploy": "npm run build && npm run zip",
+    "clean": "del get-session-lambda.zip 2>nul || echo File not found"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.450.0",
+    "@aws-sdk/lib-dynamodb": "^3.450.0",
+    "axios": "^1.6.0"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "dynamodb",
+    "session"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
