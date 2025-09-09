@@ -5,10 +5,9 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "build": "npm install --production",
-    "zip": "npm run clean && zip -r get-session-lambda.zip . -x '*.git*' 'node_modules/.cache/*' '*.md' '*.txt' '.DS_Store' '*.log'",
-    "deploy": "npm run build && npm run zip",
-    "clean": "del get-session-lambda.zip 2>nul || echo File not found"
+    "zip:win": "npm run clean:win && powershell -Command \"$files = Get-ChildItem -Path . -Exclude '*.git*', 'node_modules', '*.md', '*.txt', '.DS_Store', '*.log'; Compress-Archive -Path $files -DestinationPath .\\get-session-lambda.zip -Force\"",
+    "clean:win": "if exist get-session-lambda.zip del get-session-lambda.zip",
+    "zip": "npm run zip:win"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.450.0",

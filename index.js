@@ -6,6 +6,7 @@ const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const DynamoRepository = require('./src/repository/dynamoRepository');
 const SessionService = require('./src/services/sessionService');
 const CONSTANTS = require('./src/helpers/constants');
+const NotFoundError = require('./src/exception/notFoundError');
 const { validateInput } = require('./src/helpers/auxiliaryMethods');
 
 const dynamoClient = new DynamoDBClient({
@@ -44,13 +45,13 @@ exports.handler = async (event, context) => {
         };
 
     } catch (error) {
-        console.error('Error procesando la solicitud', error);
-        if (error.message === 'Error in getSession: Session not found') {
+        if (error instanceof NotFoundError) {
             return {
                 statusCode: 404,
                 body: JSON.stringify({ error: 'Paciente no posee sesiones' })
             };
         } else {
+            console.error('Error procesando la solicitud', error);
             return {
                 statusCode: 500,
                 body: JSON.stringify({ error: CONSTANTS.MSG_ERROR_PROCESSING })
