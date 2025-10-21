@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "zip:win": "npm run clean:win && powershell -Command \"$files = Get-ChildItem -Path . -Exclude '*.git*', 'node_modules', '*.md', '*.txt', '.DS_Store', '*.log'; Compress-Archive -Path $files -DestinationPath .\\get-session-lambda.zip -Force\"",
+    "zip:win": "npm run clean:win && powershell -Command \"$files = Get-ChildItem -Path . -Exclude '*.git*',  '*.md', '*.txt', '.DS_Store', '*.log'; Compress-Archive -Path $files -DestinationPath .\\get-session-lambda.zip -Force\"",
     "clean:win": "if exist get-session-lambda.zip del get-session-lambda.zip",
     "zip": "npm run zip:win"
   },

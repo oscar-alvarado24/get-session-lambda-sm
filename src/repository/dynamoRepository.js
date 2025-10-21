@@ -28,7 +28,7 @@ class DynamoRepository {
         try {
             const session = await this.getLastestSession(sessionId);
             if (!session) {
-                throw new NotFoundError(CONSTANTS.SESSION);
+                throw new NotFoundError(CONSTANTS.SESSION_NOT_FOUND);
             }
             return Session.fromDynamoItem(session);
         } catch (error) {

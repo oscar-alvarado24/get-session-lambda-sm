@@ -1,14 +1,14 @@
-/**
- * Servicio de Session
- * Equivalente a SessionService.java
- */
-
-const CONSTANTS = require('../helpers/constants');
 const Session = require('../model/session');
+const CryptoService = require('../helpers/crypto');
+const { validateInput } = require('../helpers/auxiliaryMethods');
+const CONSTANTS = require('../helpers/constants');
+const NotFoundError = require('../exception/notFoundError');
+
 
 class SessionService {
     constructor(dynamoRepository) {
         this.dynamoRepository = dynamoRepository;
+        this.cryptoService = new CryptoService();
     }
 
     /**
@@ -17,8 +17,62 @@ class SessionService {
      * @param {string} ip - Dirección IP
      * @returns {Promise<Session>} - Mensaje de resultado
      */
-    async getSession(email) {
-        return await this.dynamoRepository.getSession(email);
+    async getSession(emailEncripted) {
+        try {
+            if (!emailEncripted) {
+                return {
+                    success: false,
+                    statusCode: 400,
+                    message: CONSTANTS.MSG_ERROR_EMAIL_MISSING
+                }
+            }
+            const email = await this.cryptoService.decrypt(emailEncripted);
+            console.log('email', email);
+            const emailValidation = validateInput(email);
+            if (emailValidation.isValid) {
+                const session = await this.dynamoRepository.getSession(email);
+                console.log('session', session);
+                const response = {
+                    success: true,
+                    session: {
+                        email: await this.cryptoService.encrypt(session.email),
+                        connectionTime: session.connectionTime,
+                        ip: await this.cryptoService.encrypt(session.ip.toString()),
+                        city: session.city,
+                        timezone: session.timezone,
+                        country: await this.cryptoService.encrypt(session.country),
+                        latitude: await this.cryptoService.encrypt(session.latitude.toString()),
+                        longitude: await this.cryptoService.encrypt(session.longitude.toString())
+                    }
+                }
+                console.log('response', response);
+                return response
+            } else {
+                return {
+                    success: false,
+                    message: emailValidation.errors,
+                    statusCode: 400
+                }
+            }
+        }
+        catch (error) {
+            const message = "";
+            const statusCode = 0;
+            if (error instanceof NotFoundError) {
+                message = error.message;
+                statusCode = 404;
+            } else {
+                console.error(error.message);
+                message = CONSTANTS.MSG_ERROR_PROCESSING;
+                statusCode = 500;
+            }
+            return {
+                success: false,
+                message: message,
+                statusCode: statusCode
+            }
+        }
+
     }
 }
 
