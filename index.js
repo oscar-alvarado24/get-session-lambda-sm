@@ -35,14 +35,14 @@ exports.handler = async (event, context) => {
         } else {
             return {
                 statusCode: response.statusCode,
-                body: response.message
+                body: JSON.stringify({ [CONSTANTS.MESSAGE]: response.message })
             };
         }
     } catch (error) {
         console.error('Error procesando la solicitud', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: CONSTANTS.MSG_ERROR_PROCESSING })
+            body: JSON.stringify({ [CONSTANTS.ERROR]: CONSTANTS.MSG_ERROR_PROCESSING })
         };
     }
 };

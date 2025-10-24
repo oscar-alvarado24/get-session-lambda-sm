@@ -4,6 +4,9 @@
 
 const CONSTANTS = {
     ERROR_PREFIX: 'Error en',
+    ERROR: 'error',
+    MESSAGE: 'message',
+    MSG_ERROR_NOT_FOUND: 'Paciente no encontrado',
     MSG_ERROR_PARAMS_NOT_VALID: 'Parámetros no válidos',
     MSG_ERROR_PROCESSING: 'Error procesando la solicitud',
     MSG_ERROR_EMAIL_MISSING: 'Falta parámetro email',
