@@ -1,48 +1,72 @@
 /**
- * Lambda Handler
+ * Lambda Handler for retrieving user session information.
  */
 
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const DynamoRepository = require('./src/repository/dynamoRepository');
 const SessionService = require('./src/services/sessionService');
 const CONSTANTS = require('./src/helpers/constants');
-const NotFoundError = require('./src/exception/notFoundError');
-
 
 const dynamoClient = new DynamoDBClient({
     region: process.env.AWS_REGION || 'us-east-1'
 });
 const dynamoRepository = new DynamoRepository(dynamoClient);
 const sessionService = new SessionService(dynamoRepository);
+
 exports.handler = async (event, context) => {
     try {
-        // Extraer el cuerpo del evento de API Gateway
-                const body = event.body;
+        // Validar que existe el body
+        if (!event.body) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    [CONSTANTS.MESSAGE]: 'Request body is required'
+                })
+            };
+        }
+
+        const body = event.body;
         console.log('Raw event body:', body);
 
-        // Parsear el cuerpo JSON
-        const input = JSON.parse(body);
+        // Parsear el cuerpo JSON con manejo de errores
+        let input;
+        try {
+            input = JSON.parse(body);
+        } catch (parseError) {
+            console.error('Error parsing JSON:', parseError);
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    [CONSTANTS.MESSAGE]: 'Invalid JSON format'
+                })
+            };
+        }
+
         console.log('emailEncripted', input.email);
         const response = await sessionService.getSession(input.email);
-        
-        console.log('response', response); 
+
+        console.log('response', response);
 
         if (response.success) {
             return {
                 statusCode: 200,
-                body: response.session
+                body: JSON.stringify(response.session) 
             };
         } else {
             return {
                 statusCode: response.statusCode,
-                body: JSON.stringify({ [CONSTANTS.MESSAGE]: response.message })
+                body: JSON.stringify({
+                    [CONSTANTS.MESSAGE]: response.message
+                })
             };
         }
     } catch (error) {
         console.error('Error procesando la solicitud', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ [CONSTANTS.ERROR]: CONSTANTS.MSG_ERROR_PROCESSING })
+            body: JSON.stringify({
+                [CONSTANTS.ERROR]: CONSTANTS.MSG_ERROR_PROCESSING
+            })
         };
     }
 };

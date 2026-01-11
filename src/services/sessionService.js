@@ -19,6 +19,7 @@ class SessionService {
      */
     async getSession(emailEncripted) {
         try {
+            console.log(`email encriptado recibido ${emailEncripted}`);
             if (!emailEncripted) {
                 return {
                     success: false,
@@ -56,23 +57,21 @@ class SessionService {
             }
         }
         catch (error) {
-            const message = "";
-            const statusCode = 0;
             if (error instanceof NotFoundError) {
-                message = error.message;
-                statusCode = 404;
+                return {
+                    success: false,
+                    message: error.message,
+                    statusCode: 404
+                };
             } else {
                 console.error(error.message);
-                message = CONSTANTS.MSG_ERROR_PROCESSING;
-                statusCode = 500;
-            }
-            return {
-                success: false,
-                message: message,
-                statusCode: statusCode
+                return {
+                    success: false,
+                    message: CONSTANTS.MSG_ERROR_PROCESSING,
+                    statusCode: 500
+                };
             }
         }
-
     }
 }
 
