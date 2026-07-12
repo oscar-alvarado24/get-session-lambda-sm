@@ -8,7 +8,7 @@ const SessionService = require('./src/services/sessionService');
 const CONSTANTS = require('./src/helpers/constants');
 
 const dynamoClient = new DynamoDBClient({
-    region: process.env.AWS_REGION || 'us-east-1'
+    region: process.env.REGION || 'us-east-2'
 });
 const dynamoRepository = new DynamoRepository(dynamoClient);
 const sessionService = new SessionService(dynamoRepository);
@@ -50,7 +50,7 @@ exports.handler = async (event, context) => {
         if (response.success) {
             return {
                 statusCode: 200,
-                body: JSON.stringify(response.session) 
+                body: JSON.stringify(response.session)
             };
         } else {
             return {
